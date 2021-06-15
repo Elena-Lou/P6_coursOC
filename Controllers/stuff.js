@@ -8,8 +8,10 @@ exports.createThing = (req, res, next) => {
     price: req.body.price,
     userId: req.body.userId,
   });
+
   thing
     .save()
+
     .then(() => {
       res.status(201).json({
         message: "Post saved successfully!",
@@ -26,6 +28,7 @@ exports.getOneThing = (req, res, next) => {
   Thing.findOne({
     _id: req.params.id,
   })
+
     .then((thing) => {
       res.status(200).json(thing);
     })
@@ -45,8 +48,10 @@ exports.modifyThing = (req, res, next) => {
     price: req.body.price,
     userId: req.body.userId,
   });
+
   Thing.updateOne({ _id: req.params.id }, thing)
-    .then(() => {
+    
+  .then(() => {
       res.status(201).json({
         message: "Thing updated successfully!",
       });
@@ -60,7 +65,8 @@ exports.modifyThing = (req, res, next) => {
 
 exports.deleteThing = (req, res, next) => {
   Thing.deleteOne({ _id: req.params.id })
-    .then(() => {
+    
+  .then(() => {
       res.status(200).json({
         message: "Deleted!",
       });
@@ -74,6 +80,7 @@ exports.deleteThing = (req, res, next) => {
 
 exports.getAllStuff = (req, res, next) => {
   Thing.find()
+
     .then((things) => {
       res.status(200).json(things);
     })
