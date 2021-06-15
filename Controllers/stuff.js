@@ -1,12 +1,11 @@
 const Thing = require("../models/thing");
 
 exports.createThing = (req, res, next) => {
+  const thingObject = JSON.parse(req.body.thing);
+  delete thingObject._id;
   const thing = new Thing({
-    title: req.body.title,
-    description: req.body.description,
-    imageUrl: req.body.imageUrl,
-    price: req.body.price,
-    userId: req.body.userId,
+    ...thingObject,
+    imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
   });
 
   thing
@@ -14,7 +13,7 @@ exports.createThing = (req, res, next) => {
 
     .then(() => {
       res.status(201).json({
-        message: "Post saved successfully!",
+        message: "Objet enregistré!",
       });
     })
     .catch((error) => {
@@ -40,27 +39,20 @@ exports.getOneThing = (req, res, next) => {
 };
 
 exports.modifyThing = (req, res, next) => {
-  const thing = new Thing({
-    _id: req.params.id,
-    title: req.body.title,
-    description: req.body.description,
-    imageUrl: req.body.imageUrl,
-    price: req.body.price,
-    userId: req.body.userId,
-  });
-
-  Thing.updateOne({ _id: req.params.id }, thing)
-    
-  .then(() => {
-      res.status(201).json({
-        message: "Thing updated successfully!",
-      });
-    })
-    .catch((error) => {
-      res.status(400).json({
-        error: error,
-      });
-    });
+  const thingObject = req.file
+    ? {
+        ...JSON.parse(req.body.thing),
+        imageUrl: `${req.protocol}://${req.get("host")}/images/${
+          req.file.filename
+        }`,
+      }
+    : { ...req.body };
+  Thing.updateOne(
+    { _id: req.params.id },
+    { ...thingObject, _id: req.params.id }
+  )
+    .then(() => res.status(200).json({ message: "Objet modifié !" }))
+    .catch((error) => res.status(400).json({ error }));
 };
 
 exports.deleteThing = (req, res, next) => {
@@ -68,7 +60,7 @@ exports.deleteThing = (req, res, next) => {
     
   .then(() => {
       res.status(200).json({
-        message: "Deleted!",
+        message: "Supprimé !",
       });
     })
     .catch((error) => {
